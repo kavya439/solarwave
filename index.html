@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SolarWave | Premium Solar Irradiance Forecasting</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<img id="bg-image" src="bg.png" alt="Solar background">
+<div id="bg-overlay"></div>
+
+<div class="theme-celestial" id="sun-bg">
+    <svg viewBox="0 0 100 100" class="sun-svg">
+        <g id="sun-rays">
+            <rect x="47" y="5" width="6" height="15" rx="3" fill="#FFCF71"/>
+            <rect x="47" y="80" width="6" height="15" rx="3" fill="#FFCF71"/>
+            <rect x="5" y="47" width="15" height="6" rx="3" fill="#FFCF71"/>
+            <rect x="80" y="47" width="15" height="6" rx="3" fill="#FFCF71"/>
+            <rect x="18" y="18" width="12" height="6" rx="3" fill="#FFCF71" transform="rotate(45 24 24)"/>
+            <rect x="70" y="70" width="12" height="6" rx="3" fill="#FFCF71" transform="rotate(45 76 76)"/>
+            <rect x="18" y="70" width="12" height="6" rx="3" fill="#FFCF71" transform="rotate(-45 24 76)"/>
+            <rect x="70" y="18" width="12" height="6" rx="3" fill="#FFCF71" transform="rotate(-45 76 24)"/>
+            <rect x="48.5" y="10" width="3" height="8" rx="1.5" fill="#FFCF71" transform="rotate(22.5 50 50)"/>
+            <rect x="48.5" y="10" width="3" height="8" rx="1.5" fill="#FFCF71" transform="rotate(67.5 50 50)"/>
+            <rect x="48.5" y="10" width="3" height="8" rx="1.5" fill="#FFCF71" transform="rotate(112.5 50 50)"/>
+            <rect x="48.5" y="10" width="3" height="8" rx="1.5" fill="#FFCF71" transform="rotate(157.5 50 50)"/>
+            <rect x="48.5" y="10" width="3" height="8" rx="1.5" fill="#FFCF71" transform="rotate(202.5 50 50)"/>
+            <rect x="48.5" y="10" width="3" height="8" rx="1.5" fill="#FFCF71" transform="rotate(247.5 50 50)"/>
+            <rect x="48.5" y="10" width="3" height="8" rx="1.5" fill="#FFCF71" transform="rotate(292.5 50 50)"/>
+            <rect x="48.5" y="10" width="3" height="8" rx="1.5" fill="#FFCF71" transform="rotate(337.5 50 50)"/>
+        </g>
+        <circle cx="50" cy="50" r="28" fill="#FFCF71"/>
+        <path d="M50 22 A 28 28 0 0 1 78 50 A 28 28 0 0 0 50 22" fill="#F4B459" opacity="0.3"/>
+    </svg>
+</div>
+
+<div class="theme-celestial" id="moon-bg">
+    <svg viewBox="0 0 100 100" class="moon-svg" style="filter:drop-shadow(0 0 20px rgba(255,255,255,0.2))">
+        <g style="transform-origin:center;animation:sun-rotate 30s linear infinite reverse">
+            <rect x="47" y="5" width="6" height="15" rx="3" fill="#E0E0E0"/>
+            <rect x="47" y="80" width="6" height="15" rx="3" fill="#E0E0E0"/>
+            <rect x="5" y="47" width="15" height="6" rx="3" fill="#E0E0E0"/>
+            <rect x="80" y="47" width="15" height="6" rx="3" fill="#E0E0E0"/>
+            <rect x="18" y="18" width="12" height="6" rx="3" fill="#E0E0E0" transform="rotate(45 24 24)"/>
+            <rect x="70" y="70" width="12" height="6" rx="3" fill="#E0E0E0" transform="rotate(45 76 76)"/>
+            <rect x="18" y="70" width="12" height="6" rx="3" fill="#E0E0E0" transform="rotate(-45 24 76)"/>
+            <rect x="70" y="18" width="12" height="6" rx="3" fill="#E0E0E0" transform="rotate(-45 76 24)"/>
+        </g>
+        <circle cx="50" cy="50" r="28" fill="#E0E0E0"/>
+        <path d="M50 22 A 28 28 0 1 0 78 50 A 24 24 0 1 1 50 22" fill="#808080" opacity="0.3"/>
+    </svg>
+</div>
+
+<nav>
+    <div class="nav-link active" onclick="showPage('home')"><i data-lucide="home"></i><span class="nav-text">Home</span></div>
+    <div class="nav-link" onclick="showPage('locations')"><i data-lucide="map-pin"></i><span class="nav-text">Locations</span></div>
+    <div class="nav-link" onclick="showPage('about')"><i data-lucide="users"></i><span class="nav-text">About</span></div>
+    <div class="nav-link" id="theme-btn" onclick="toggleTheme()"><i data-lucide="moon"></i><span class="nav-text">Theme</span></div>
+</nav>
+
+<div id="home" class="page active">
+    <div class="hero animate-fade-in">
+        <h1>SolarWave AI</h1>
+        <p>Empowering the future with precision solar irradiance forecasting using real-time atmospheric data and advanced machine learning models.</p>
+        <div class="hero-buttons">
+            <button class="btn btn-primary" onclick="showPage('locations')">Launch Dashboard <i data-lucide="arrow-right"></i></button>
+        </div>
+    </div>
+</div>
+
+<div id="locations" class="page">
+    <div class="locations-header">
+        <h2>Real-time Monitoring</h2>
+        <p style="color:var(--text-dim);margin-top:.5rem">Select a location to analyze live solar parameters and forecast irradiance.</p>
+        <button class="btn btn-primary animate-fade-in" onclick="useCurrentLocation()" style="margin-top:1.5rem;background:var(--bg-dark);color:var(--primary);border:1px solid var(--primary)">
+            <i data-lucide="navigation"></i> Use My Current Location
+        </button>
+    </div>
+    <div class="locations-grid" id="loc-grid"></div>
+    <div class="glass" style="width:100%;margin-top:2.5rem;padding:1.5rem">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem">
+            <i data-lucide="map"></i><span style="font-weight:700">Global Solar Network</span>
+        </div>
+        <div id="map"></div>
+    </div>
+</div>
+
+<div id="predict" class="page">
+    <div class="predict-header">
+        <div class="predict-back-row">
+            <button onclick="showPage('locations')" style="background:none;border:1px solid var(--glass-border);color:var(--text-main);padding:.5rem 1rem;border-radius:50px;cursor:pointer;display:flex;align-items:center;gap:6px;font-size:.85rem;white-space:nowrap">
+                <i data-lucide="chevron-left"></i> Back
+            </button>
+            <h2 id="current-loc-name" style="font-size:clamp(1.3rem,4vw,2rem)">Nellore Dashboard</h2>
+        </div>
+        <div class="predict-container">
+            <div class="glass form-section">
+                <h3 style="margin-bottom:1.75rem">Forecast Configuration</h3>
+                <label class="badge-label">Select Specific Area</label>
+                <select id="area-select"><option value="">Select Area</option></select>
+                <label class="badge-label">Forecast Date</label>
+                <input type="date" id="target-date">
+                <label class="badge-label">Forecast Start Time</label>
+                <input type="time" id="target-time" value="12:00">
+                <button class="btn btn-primary" style="width:100%;margin-top:1.5rem" onclick="runPrediction()">Calculate Irradiance <i data-lucide="zap"></i></button>
+            </div>
+            <div class="glass data-v-section">
+                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem">
+                    <h3 style="display:flex;align-items:center;gap:10px"><i data-lucide="radio" style="color:var(--accent)"></i> Live Telemetry</h3>
+                    <span id="coord-display" style="font-family:monospace;color:var(--text-dim);font-size:.78rem">14.44°N, 79.98°E</span>
+                </div>
+                <div id="live-data-stream">
+                    <div class="real-time-badge"><span class="badge-label">Ambient Temp</span><span class="badge-value" id="live-temp">--°C</span></div>
+                    <div class="real-time-badge"><span class="badge-label">Relative Humidity</span><span class="badge-value" id="live-hum">--%</span></div>
+                    <div class="real-time-badge"><span class="badge-label">Surface Pressure</span><span class="badge-value" id="live-pres">-- hPa</span></div>
+                    <div class="real-time-badge"><span class="badge-label">Direct Radiation</span><span class="badge-value" id="live-rad">-- W/m²</span></div>
+                </div>
+                <div class="mini-chart-wrap"><canvas id="mini-stream-chart"></canvas></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="result" class="page">
+    <div class="glass result-wrapper">
+        <div class="result-header">
+            <div>
+                <h2 id="res-location" style="font-size:clamp(1.2rem,3vw,1.75rem)">Nellore, Vedayapalem</h2>
+                <p style="color:var(--text-dim);margin-top:.25rem" id="res-time">Target Time: 12:00 PM</p>
+            </div>
+            <div class="result-right">
+                <p class="badge-label">Forecasted Irradiance</p>
+                <div class="main-value" id="res-value">845.2 <small style="font-size:1.4rem">W/m²</small></div>
+            </div>
+        </div>
+        <div class="forecast-chart-wrap"><canvas id="forecast-chart"></canvas></div>
+        <div class="stats-grid">
+            <div class="glass stat-item"><div class="stat-label">Air Quality</div><div class="stat-val" id="res-aqi" style="color:#4CAF50">Good</div></div>
+            <div class="glass stat-item"><div class="stat-label">Cloud Cover</div><div class="stat-val" id="res-cloud">12%</div></div>
+            <div class="glass stat-item"><div class="stat-label">UV Index</div><div class="stat-val" id="res-uv">6.4</div></div>
+            <div class="glass stat-item"><div class="stat-label">Day Length</div><div class="stat-val">12.4 hrs</div></div>
+        </div>
+        <div style="margin-top:2.5rem;border-top:1px solid var(--glass-border);padding-top:2rem">
+            <h3 style="margin-bottom:1.5rem;display:flex;align-items:center;gap:10px;font-size:clamp(1rem,2.5vw,1.2rem)">
+                <i data-lucide="brain-circuit" style="color:var(--accent)"></i> Solar Intelligence Hub
+            </h3>
+            <div class="stats-grid">
+                <div class="glass stat-item" style="border:1px solid rgba(0,242,255,0.2)"><div class="stat-label">Efficiency Score</div><div class="stat-val" id="res-score" style="color:var(--accent)">84/100</div></div>
+                <div class="glass stat-item"><div class="stat-label">Optimal Panel Tilt</div><div class="stat-val" id="res-tilt">14.4° South</div></div>
+                <div class="glass stat-item"><div class="stat-label">Est. Energy Yield</div><div class="stat-val" id="res-yield">5.2 kWh/kWp</div></div>
+                <div class="glass stat-item" style="border:1px solid rgba(76,175,80,0.2)"><div class="stat-label">Monthly ROI Est.</div><div class="stat-val" id="res-savings" style="color:#4CAF50">₹ 4,250</div></div>
+            </div>
+        </div>
+        <div class="result-actions">
+            <button class="btn" style="border:1px solid var(--glass-border);color:var(--text-main);background:transparent" onclick="showPage('predict')">Recalculate</button>
+            <button class="btn btn-primary" onclick="downloadPNG()">Download PNG <i data-lucide="download"></i></button>
+            <button class="btn btn-primary" onclick="showPage('home')">Back to Home</button>
+        </div>
+    </div>
+</div>
+
+<div id="about" class="page">
+    <div class="about-header">
+        <h2>The Innovation Team</h2>
+        <p style="color:var(--text-dim)">Dedicated students pushing the boundaries of renewable energy technology through data science and engineering.</p>
+    </div>
+    <div class="about-team">
+        <div class="glass member-card"><div class="member-icon"><i data-lucide="user"></i></div><h3 style="font-size:1.05rem">P. KAVYANJALI</h3></div>
+        <div class="glass member-card"><div class="member-icon"><i data-lucide="user"></i></div><h3 style="font-size:1.05rem">B. VANDHANA</h3></div>
+        <div class="glass member-card"><div class="member-icon"><i data-lucide="user"></i></div><h3 style="font-size:1.05rem">N. PRASANTHI</h3></div>
+        <div class="glass member-card"><div class="member-icon"><i data-lucide="user"></i></div><h3 style="font-size:1.05rem">P. SARANYA</h3></div>
+        <div class="glass member-card"><div class="member-icon"><i data-lucide="user"></i></div><h3 style="font-size:1.05rem">K. J. SUBHASRI</h3></div>
+    </div>
+    <div class="glass" style="margin-top:3rem;padding:2.5rem;text-align:center;max-width:800px;width:100%">
+        <h3>Project Vision</h3>
+        <p style="color:var(--text-dim);margin-top:1rem;line-height:1.8;font-size:clamp(.85rem,2vw,1rem)">Our Solar Irradiance Prediction model utilizes real-time atmospheric inputs including Temperature, Humidity, and Pressure to provide high-fidelity forecasts. This enables the optimization of solar grid management and promotes efficient energy consumption patterns for a sustainable future.</p>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
